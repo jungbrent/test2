@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>블로그 분석기</title>
+<style>
+    body {
+        font-family: Arial;
+        max-width: 700px;
+        margin: 40px auto;
+    }
+    input, button {
+        padding: 10px;
+        margin: 5px 0;
+        width: 100%;
+    }
+    .card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-top: 10px;
+        border-radius: 8px;
+    }
+</style>
+</head>
+<body>
+
+<h1>블로그 분석기</h1>
+
+<input type="text" id="url" placeholder="URL 입력">
+<input type="text" id="keyword" placeholder="키워드 입력">
+<button onclick="analyze()">분석하기</button>
+
+<div id="result"></div>
+
+<script>
+async function analyze() {
+    const url = document.getElementById("url").value;
+    const keyword = document.getElementById("keyword").value;
+
+    const apiUrl = "https://YOUR-RENDER-URL.onrender.com/analyze";
+
+    const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ url, keyword })
+    });
+
+    const data = await res.json();
+
+    if(data.error){
+        document.getElementById("result").innerHTML =
+            `<div class="card">에러: ${data.error}</div>`;
+        return;
+    }
+
+    document.getElementById("result").innerHTML = `
+        <div class="card">총 글자수: ${data.char_count}</div>
+        <div class="card">공백 제외 글자수: ${data.char_no_space}</div>
+        <div class="card">단어수: ${data.word_count}</div>
+        <div class="card">이미지수: ${data.image_count}</div>
+        <div class="card">키워드 반복횟수: ${data.keyword_count}</div>
+        <div class="card">상위 단어: ${data.common_words.map(w => w[0] + " (" + w[1] + ")").join(", ")}</div>
+    `;
+}
+</script>
+
+</body>
+</html>
